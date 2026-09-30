@@ -21,6 +21,8 @@ try {
     & $pwsh -NoProfile -File tools/Test-Publication.ps1 *> $null
     if ($LASTEXITCODE -ne 0) { throw 'Safe baseline was incorrectly rejected.' }
     & git commit --quiet -m 'Safe test baseline'
+    & $pwsh -NoProfile -File tools/Test-Publication.ps1 -History *> $null
+    if ($LASTEXITCODE -ne 0) { throw 'Safe history containing dotfiles was incorrectly rejected.' }
     function Expect-Rejected([string]$description, [switch]$History) {
         $arguments = @('-NoProfile','-File','tools/Test-Publication.ps1')
         if ($History) { $arguments += '-History' }

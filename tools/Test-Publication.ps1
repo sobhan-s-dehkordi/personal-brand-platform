@@ -29,7 +29,7 @@ try {
         }
     }
     function Assert-File([string]$fullPath, [string]$path) {
-        $file = Get-Item -LiteralPath $fullPath
+        $file = Get-Item -LiteralPath $fullPath -Force
         if ($file.Length -gt $policy.maxFileBytes) { throw "Publication blocked: file exceeds 2 MiB ($path)." }
         $bytes = [IO.File]::ReadAllBytes($fullPath)
         $binary = [IO.Path]::GetExtension($path) -in @('.woff2','.ico') -or $bytes.Contains([byte]0)
