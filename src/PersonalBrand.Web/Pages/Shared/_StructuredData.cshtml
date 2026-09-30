@@ -1,0 +1,53 @@
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@using System.Text.Json
+@using PersonalBrand.Core
+@inject PersonalBrand.Infrastructure.SiteContent SiteCopy
+@inject Microsoft.Extensions.Options.IOptions<SiteOptions> Site
+@{
+    var brand = await SiteCopy.BrandAsync(ViewContext.RouteData.Values["culture"]?.ToString() ?? "en");
+    var url = Site.Value.BaseUrl.TrimEnd('/') + Context.Request.Path;
+    var data = new Dictionary<string, object?>
+    {
+        ["@context"] = "https://schema.org"
+    };
+    if (Model is PersonalBrand.Web.Pages.DetailModel detail && detail.Item is Article a)
+    {
+        data["@type"] = "Article";
+        data["headline"] = a.Title;
+        data["description"] = Markdown.PlainText(a.Summary);
+        data["datePublished"] = a.PublishedAt;
+        data["dateModified"] = a.UpdatedAt;
+        data["author"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "Person",
+            ["name"] = brand.Name
+        };
+    }
+    else if (Model is PersonalBrand.Web.Pages.DetailModel cd && cd.Item is Course c)
+    {
+        data["@type"] = "Course";
+        data["name"] = c.Title;
+        data["description"] = Markdown.PlainText(c.Summary);
+        data["isAccessibleForFree"] = true;
+        data["provider"] = new Dictionary<string, object?>
+        {
+            ["@type"] = "Person",
+            ["name"] = brand.Name
+        };
+    }
+    else
+    {
+        data["@type"] = "Person";
+        data["name"] = brand.Name;
+        data["jobTitle"] = brand.ProfessionalTitle;
+    }
+
+    data["url"] = url;
+}
+<script type="application/ld+json" nonce="@Context.Items["CspNonce"]">
+    @Html.Raw(JsonSerializer.Serialize(data))</script>
+@if(Model is PersonalBrand.Web.Pages.DetailModel d){
+    var crumbs=new Dictionary<string,object?>{["@context"]="https://schema.org",["@type"]="BreadcrumbList",["itemListElement"]=new object[]{new Dictionary<string,object?>{["@type"]="ListItem",["position"]=1,["name"]=Ui.Label(d.Section,d.Culture),["item"]=Site.Value.BaseUrl.TrimEnd('/')+"/"+d.Culture+"/"+d.Section},new Dictionary<string,object?>{["@type"]="ListItem",["position"]=2,["name"]=d.Item.Title,["item"]=url}}};
+    <script type="application/ld+json" nonce="@Context.Items["CspNonce"]">
+        @Html.Raw(JsonSerializer.Serialize(crumbs))</script>
+}

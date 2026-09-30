@@ -1,0 +1,82 @@
+@inject PersonalBrand.Infrastructure.SiteContent SiteCopy
+@inject Microsoft.Extensions.Options.IOptions<PersonalBrand.Core.SiteOptions> Site
+@{
+    var culture = ViewContext.RouteData.Values["culture"]?.ToString() ?? "en";
+    var fa = culture == "fa";
+    var brand = await SiteCopy.BrandAsync(culture);
+    var canonical = Site.Value.BaseUrl.TrimEnd('/') + Context.Request.Path;
+    var alternate = ViewData["TranslationPath"]?.ToString();
+    string Text(string key) => SiteCopy.Get(key, culture);
+}
+<!DOCTYPE html>
+<html lang="@culture" dir="@(fa ? "rtl" : "ltr")">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <title>
+            @ViewData["Title"] — @brand.Name</title>
+        <meta name="description" content="@(ViewData["Description"] ?? brand.DefaultSeoDescription)"/>
+        <link rel="canonical" href="@canonical"/>
+        <meta property="og:title" content="@ViewData["Title"]"/>
+        <meta property="og:description" content="@(ViewData["Description"] ?? brand.DefaultSeoDescription)"/>
+        <meta property="og:url" content="@canonical"/>
+        <meta name="twitter:card" content="summary"/>
+        @if (ViewData["NoIndex"] is true)
+        {
+            <meta name="robots" content="noindex,nofollow"/>
+        }
+        @if (alternate is not null)
+        {
+            <link rel="alternate" hreflang="@(fa ? "en" : "fa")" href="@(Site.Value.BaseUrl.TrimEnd('/') + alternate)"/>
+            <link rel="alternate" hreflang="@culture" href="@canonical"/>
+        }
+        <link rel="preload" href="@(fa ? "/fonts/Vazirmatn-Variable.woff2" : "/fonts/Inter-Variable.woff2")" as="font" type="font/woff2" crossorigin/>
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/typography.css" asp-append-version="true"/>
+        @if (ViewData["NoIndex"] is not true && (Model is HomeModel || Model is DetailModel || Model is InfoModel { Name: "about" }))
+        {
+            <partial name="_StructuredData"/>
+        }
+    </head>
+    <body>
+        <a class="skip-link" href="#main">
+            @Text("Navigation.Skip")</a>
+        <header class="site-header">
+            <a class="brand" href="/@culture">
+                @brand.Name<span class="brand-dot">.</span>
+            </a>
+            <nav aria-label="@Text("Navigation.Label")">
+                @foreach (var section in Ui.Sections.Concat(new[] { "about" }))
+                {
+                    <a href="/@culture/@(section)">
+                        @Text("Navigation." + section)</a>
+                }
+            </nav>
+            <a class="language" href="@(alternate ?? (fa ? "/en" : "/fa"))">
+                @Text("Navigation.Switch")</a>
+        </header>
+        <main id="main" class="shell">
+            @if (TempData["Message"] is string message)
+            {
+                <div class="callout" role="status">
+                    @message</div>
+            }
+            @RenderBody()
+        </main>
+        <footer class="site-footer">
+            <span>
+                @Text("Footer.Text")</span>
+            <nav>
+                @foreach (var section in new[] { "resume", "now", "contact", "privacy" })
+                {
+                    <a href="/@culture/@(section)">
+                        @Text("Navigation." + section)</a>
+                }
+            </nav>
+        </footer>
+        <script src="~/js/site.js" asp-append-version="true" defer>
+        </script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+</html>

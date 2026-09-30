@@ -1,0 +1,19 @@
+@page
+@model PersonalBrand.Admin.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Admin sign in";
+}
+<section class="reading">
+    <span class="eyebrow">Workspace</span>
+    <h1>Welcome back.</h1>
+    <p>Sign in to manage content and registrations.</p>
+    <form method="post">
+        <div asp-validation-summary="All">
+        </div>
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" autocomplete="username"/>
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" autocomplete="current-password"/>
+        <button class="btn btn-dark">Sign in</button>
+    </form>
+</section>

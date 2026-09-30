@@ -1,0 +1,120 @@
+@page "/{culture:regex(^(en|fa)$)}/{section:regex(^(articles|courses|projects|workshops)$)}/{slug}"
+@model DetailModel
+@using PersonalBrand.Core
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@{
+    ViewData["Title"] = Model.Item.SeoTitle ?? Model.Item.Title;
+    ViewData["Description"] = Model.Item.SeoDescription ?? Markdown.PlainText(Model.Item.Summary);
+}
+<article class="reading">
+    <a href="/@Model.Culture/@Model.Section">← @Ui.Label(Model.Section, Model.Culture)</a>
+    <header class="page-heading">
+        <span class="eyebrow">
+            @Model.Section</span>
+        <h1>
+            @Model.Item.Title</h1>
+        <div class="lead prose">
+            @Html.Raw(Markdown.Render(Model.Item.Summary))</div>
+    </header>
+    @if(Model.Item.CoverImage is not null) {
+        <img src="@Model.Item.CoverImage" alt="" class="cover"/> }
+    <div class="prose">
+        @Html.Raw(Markdown.Render(Model.Item.Body))</div>
+    @if(Model.Item is Article article) {
+        <p>
+            @article.ReadingTime @Model.T("min read", "دقیقه مطالعه")</p>
+        <div class="tags">
+            @foreach(var tag in article.Tags) {
+                <a href="/@Model.Culture/articles?tag=@Uri.EscapeDataString(tag.Name)">
+                    @tag.Name</a>
+            }
+        </div>
+        <h2>
+            @Model.T("Keep exploring", "ادامه مطالعه")</h2>
+        @foreach(var related in Model.Related) {
+            <p>
+                <a href="/@Model.Culture/articles/@related.Slug">
+                    @related.Title</a>
+            </p>
+        }
+        @foreach(var course in article.RelatedCourses.Where(x => x.IsVisible && x.Status == ContentStatus.Published)) {
+            <p>
+                <a href="/@course.Language/courses/@course.Slug">
+                    @course.Title</a>
+            </p>
+        } }
+    @if(Model.Item is Course c) {
+        <div class="callout">
+            <strong>
+                @Model.T("Free, open learning.", "یادگیری رایگان و آزاد.")</strong>
+            <p>
+                @Model.T("Every lesson is available without an account.", "همه درس‌ها بدون حساب کاربری در دسترس‌اند.")</p>
+            <a class="btn btn-dark" href="/@Model.Culture/courses/@c.Slug/enroll">
+                @Model.T("Enroll in this course", "ثبت‌نام در دوره")</a>
+        </div>
+        <h2>
+            @Model.T("Lessons", "درس‌ها")</h2>
+        <ol class="lesson-list">
+            @foreach(var lesson in c.Lessons.OrderBy(x => x.Order)) {
+                <li>
+                    <a href="/@Model.Culture/courses/@c.Slug/lessons/@lesson.Slug">
+                        @lesson.Title</a> <span>
+                        @lesson.Duration min</span>
+                </li>
+            }
+        </ol>
+    }
+    @if(Model.Item is Project p) { @foreach(var part in new[] { ("Problem", "مسئله", p.Problem), ("Solution", "راه‌حل", p.Solution), ("Architecture", "معماری", p.ArchitectureDescription), ("Challenges", "چالش‌ها", p.Challenges), ("Results", "نتیجه", p.Results) }) {
+            <h2>
+                @Model.T(part.Item1, part.Item2)</h2>
+            <div class="prose">
+                @Html.Raw(Markdown.Render(part.Item3))</div>
+        }
+        <p>
+            @string.Join(" · ", p.Technologies.Select(x => x.Name))</p>
+        @if(p.GitHubUrl is not null) {
+            <a href="@p.GitHubUrl" rel="noopener">GitHub ↗</a>
+        }
+        @if(p.LiveDemoUrl is not null) {
+            <a href="@p.LiveDemoUrl" rel="noopener">Live demo ↗</a>
+        }
+        @foreach(var screenshot in p.Screenshots) {
+            <img class="cover" src="@screenshot.Path" alt="@screenshot.Alt" loading="lazy"/> } }
+    @if(Model.Item is Workshop w) {
+        <div class="callout">
+            <h2>
+                @w.Price.ToString("N0") @w.Currency</h2>
+            <p>
+                @Model.Remaining / @w.Capacity @Model.T("seats available", "صندلی خالی") · @w.TimeZoneId</p>
+            @if(Model.CanReserve) {
+                <a class="btn btn-dark" href="/@Model.Culture/workshops/@w.Slug/reserve">
+                    @Model.T("Reserve a seat", "رزرو صندلی")</a>
+            }
+        </div>
+        <h2>
+            @Model.T("Who this is for", "مخاطبان")</h2>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(w.Audience))</div>
+        <h2>
+            @Model.T("Prerequisites", "پیش‌نیازها")</h2>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(w.Prerequisites))</div>
+        <h2>
+            @Model.T("What you will build", "چه می‌سازیم")</h2>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(w.WhatYouWillBuild))</div>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(w.Platform))</div>
+        <h2>
+            @Model.T("Schedule", "برنامه جلسات")</h2>
+        @foreach(var session in w.Sessions.OrderBy(x => x.SessionNumber)) {
+            <div class="callout">
+                <h3>
+                    @session.Title</h3>
+                <div class="prose">
+                    @Html.Raw(Markdown.Render(session.Description))</div>
+                <time>
+                    @TimeZoneInfo.ConvertTime(session.StartAt, TimeZoneInfo.FindSystemTimeZoneById(w.TimeZoneId)).ToString("yyyy-MM-dd HH:mm") — @TimeZoneInfo.ConvertTime(session.EndAt, TimeZoneInfo.FindSystemTimeZoneById(w.TimeZoneId)).ToString("HH:mm")</time>
+            </div>
+        } }
+</article>

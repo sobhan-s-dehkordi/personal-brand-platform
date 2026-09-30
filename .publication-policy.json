@@ -1,0 +1,25 @@
+{
+  "maxFileBytes": 2097152,
+  "allowedPaths": [
+    "^(README|SECURITY|CONTRIBUTING)\\.md$",
+    "^\\.(gitignore|gitattributes|dockerignore|editorconfig|env\\.example|publication-policy\\.json|gitleaks\\.toml)$",
+    "^(Directory\\.Build\\.props|PersonalBrand\\.sln|dotnet-tools\\.json|docker-compose\\.yml)$",
+    "^\\.github/(workflows/[a-z-]+\\.yml|CODEOWNERS|dependabot\\.yml)$",
+    "^\\.githooks/(pre-commit|pre-push)$",
+    "^tools/(Initialize-Repository|Install-Gitleaks|Test-Publication|Test-PublicationGuards|Publish)\\.ps1$",
+    "^docs/(ARCHITECTURE|WORKSHOP-RESERVATION|AUDIENCE-AND-CONSENT|ADMIN-GUIDE|SAFE-PUBLISHING)\\.md$",
+    "^src/PersonalBrand\\.(Core|Infrastructure|Web|Admin)/.+\\.(cs|cshtml|csproj|css|js|txt|md|woff2|ico)$",
+    "^src/PersonalBrand\\.(Web|Admin)/(Dockerfile|appsettings(?:\\.Development)?\\.json|Properties/launchSettings\\.json)$",
+    "^src/PersonalBrand\\.(Web|Admin)/wwwroot/lib/[A-Za-z0-9_./-]+/(LICENSE|LICENSE-MIT)$",
+    "^tests/PersonalBrand\\.(UnitTests|IntegrationTests|FunctionalTests)/.+\\.(cs|csproj)$"
+  ],
+  "deniedPaths": "(?i)(^|/)(bin|obj|App_Data|TestResults|uploads|receipts|backups|logs|secrets|credentials|node_modules|\\.git|\\.aws|\\.azure|\\.ssh|\\.vs|\\.local-tools)(/|$)|(?:\\.local\\.|\\.Production\\.json$)|\\.(map|db|sqlite\\d*|mdf|ldf|ndf|bak|sql|csv|xlsx|pdf|zip|7z|pfx|pem|key|kdbx|dll|exe|pdb|log|trx|tmp|dump|dmp)$",
+  "approvedBinaryHashes": {
+    "src/PersonalBrand.Admin/wwwroot/favicon.ico": "26dc5ff4bfb9213291735808465e156d4a4691135f3815e3613761243e1f69c3",
+    "src/PersonalBrand.Admin/wwwroot/fonts/Vazirmatn-Variable.woff2": "4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92",
+    "src/PersonalBrand.Web/wwwroot/favicon.ico": "26dc5ff4bfb9213291735808465e156d4a4691135f3815e3613761243e1f69c3",
+    "src/PersonalBrand.Admin/wwwroot/fonts/Inter-Variable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/PersonalBrand.Web/wwwroot/fonts/Inter-Variable.woff2": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+    "src/PersonalBrand.Web/wwwroot/fonts/Vazirmatn-Variable.woff2": "4e3fa217d38fdafc1fea4414ceb58ca5e662cf0ab5fa735a8c8c20e8b42cad92"
+  }
+}

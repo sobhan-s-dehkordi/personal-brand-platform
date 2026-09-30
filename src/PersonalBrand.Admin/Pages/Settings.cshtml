@@ -1,0 +1,37 @@
+@page
+@model SettingsModel
+@{
+    ViewData["Title"] = "Site settings";
+}
+<h1>Pages and settings</h1>
+<p class="help">Edit both languages and save them together.</p>
+<form method="post">
+    <div asp-validation-summary="All"></div>
+    <fieldset>
+        <legend>Bank transfer details</legend>
+        @foreach(var key in SettingsModel.Keys.Where(k => k.StartsWith("Payment."))) {
+            <label for="@key">
+                @(key switch { "Payment.BankName" => "Bank name", "Payment.CardHolderName" => "Cardholder name", "Payment.CardNumberDisplay" => "Card number", "Payment.Instructions.fa" => "Persian payment instructions", _ => "English payment instructions" })</label>
+            @if(key.Contains("Instructions")) {
+                <textarea rich-editor id="@key" name="Values[@key]" dir="@(key.EndsWith(".fa") ? "rtl" : "ltr")">@Model.Values.GetValueOrDefault(key)</textarea>
+            }
+            else {
+                <input id="@key" name="Values[@key]" value="@Model.Values.GetValueOrDefault(key)"/> }
+        }
+    </fieldset>
+    <fieldset>
+        <legend>Page content</legend>
+        @foreach(var page in SettingsModel.Pages) {
+            <details>
+                <summary>
+                    @(page switch { "about" => "About me", "resume" => "Resume", "now" => "Now", "contact" => "Contact", _ => "Privacy policy" })</summary>
+                @foreach(var language in new[]{"en","fa"}) { var key=$"Page.{page}.{language}";
+                    <label for="@key">
+                        @(language=="fa"?"Persian":"English")</label>
+                    <textarea rich-editor id="@key" name="Values[@key]" dir="@(key.EndsWith(".fa") ? "rtl" : "ltr")">@Model.Values.GetValueOrDefault(key)</textarea>
+                }
+            </details>
+        }
+    </fieldset>
+    <button class="btn btn-dark">Save settings</button>
+</form>

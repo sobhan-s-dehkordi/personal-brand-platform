@@ -1,0 +1,83 @@
+@page "/{kind:regex(^(Contacts|Subscribers)$)}"
+@model AudienceModel
+<h1>
+    @(Model.Kind == "Contacts" ? "Contacts" : "Subscribers")</h1>
+<form method="get" class="panel form-grid">
+    <label for="q">Name or email</label>
+    <input name="q" id="q" value="@Model.Q"/>
+    <label for="language">Language</label>
+    <select name="language" id="language">
+        <option value="">All</option>
+        <option value="en" selected="@(Model.Language=="en")">English</option>
+        <option value="fa" selected="@(Model.Language=="fa")">Persian</option>
+    </select>
+    <label for="since">Joined since</label>
+    <input type="date" name="since" id="since"/>
+    <label for="consent">Newsletter consent</label>
+    <select name="consent" id="consent">
+        <option value="">All</option>
+        <option value="true">Opted in</option>
+        <option value="false">Not opted in</option>
+    </select>
+    <label for="course">Course</label>
+    <select id="course" name="course">
+        <option value="">All</option>
+        @foreach(var c in Model.Courses){
+            <option value="@c.Id" selected="@(c.Id==Model.Course)">
+                @c.Title</option>
+        }
+    </select>
+    <label for="workshop">Workshop</label>
+    <select id="workshop" name="workshop">
+        <option value="">All</option>
+        @foreach(var w in Model.Workshops){
+            <option value="@w.Id" selected="@(w.Id==Model.Workshop)">
+                @w.Title</option>
+        }
+    </select>
+    <label for="subscription">Subscription status</label>
+    <select id="subscription" name="subscription">
+        <option value="">All</option>
+        <option value="Active" selected="@(Model.Subscription==PersonalBrand.Core.SubscriptionStatus.Active)">Active</option>
+        <option value="Unsubscribed" selected="@(Model.Subscription==PersonalBrand.Core.SubscriptionStatus.Unsubscribed)">Unsubscribed</option>
+    </select>
+    <button class="btn btn-dark">Show results</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Contact</th>
+            <th>Language</th>
+            <th>Enrollments</th>
+            <th>Reservations and receipts</th>
+            <th>Newsletter</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model.Items){
+            <tr>
+                <td>
+                    <a href="/Contacts/@item.Id">
+                        @item.Name</a>
+                    <br/>
+                    @item.Email</td>
+                <td>
+                    @item.Language</td>
+                <td>
+                    @item.Enrollments</td>
+                <td>
+                    @item.Reservations</td>
+                <td>
+                    @item.Subscription</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<nav class="pagination">
+    @if(Model.Number>1){
+        <a asp-route-number="@(Model.Number-1)" asp-route-q="@Model.Q" asp-route-language="@Model.Language" asp-route-consent="@Model.Consent" asp-route-course="@Model.Course" asp-route-workshop="@Model.Workshop" asp-route-subscription="@Model.Subscription" asp-route-since="@Model.Since">Previous</a>
+    }
+    @if(Model.Items.Count==25){
+        <a asp-route-number="@(Model.Number+1)" asp-route-q="@Model.Q" asp-route-language="@Model.Language" asp-route-consent="@Model.Consent" asp-route-course="@Model.Course" asp-route-workshop="@Model.Workshop" asp-route-subscription="@Model.Subscription" asp-route-since="@Model.Since">Next</a>
+    }
+</nav>

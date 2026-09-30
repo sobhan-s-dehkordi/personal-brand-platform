@@ -1,0 +1,20 @@
+@page "/{culture:regex(^(en|fa)$)}/unsubscribe/{token}"
+@model UnsubscribeModel
+@{
+    ViewData["Title"] = Model.T("Unsubscribe", "لغو عضویت");
+    ViewData["NoIndex"] = true;
+}
+<h1>
+    @ViewData["Title"]</h1>
+@if(Model.Done) {
+    <p>
+        @Model.T("You are unsubscribed from promotional updates. Workshop records and essential logistics messages are retained.", "عضویت شما در پیام‌های تبلیغاتی لغو شد. سوابق کارگاه و پیام‌های ضروری حفظ می‌شوند.")</p>
+}
+else {
+    <form method="post">
+        <p>
+            @Model.T("Stop receiving future articles, courses, and workshop announcements?", "دریافت اخبار مقاله‌ها، دوره‌ها و کارگاه‌ها متوقف شود؟")</p>
+        <button class="btn btn-dark">
+            @ViewData["Title"]</button>
+    </form>
+}

@@ -1,0 +1,43 @@
+@page "/{culture:regex(^(en|fa)$)}/{section:regex(^(courses|workshops)$)}/{slug}/{action:regex(^(enroll|reserve)$)}"
+@model JoinModel
+@{
+    ViewData["Title"] = Model.Item.Title;
+    ViewData["NoIndex"] = true;
+}
+<section class="reading">
+    <span class="eyebrow">
+        @Model.T("JOIN THE LEARNING", "همراه یادگیری")</span>
+    <h1>
+        @Model.Item.Title</h1>
+    <p>
+        @Model.T(Model.Workshop ? "Reserve a temporary seat, then follow the payment instructions." : "Enroll for free. All lessons remain available without an account.", Model.Workshop ? "صندلی را موقتاً رزرو کنید و سپس راهنمای پرداخت را دنبال کنید." : "ثبت‌نام رایگان است. درس‌ها بدون حساب کاربری قابل استفاده‌اند.")</p>
+    <form method="post">
+        <div asp-validation-summary="All">
+        </div>
+        <div class="honeypot" aria-hidden="true">
+            <label asp-for="Website">Website</label>
+            <input asp-for="Website" tabindex="-1" autocomplete="off"/>
+        </div>
+        <label asp-for="Input.FullName">
+            @Model.T("Full name", "نام و نام خانوادگی")</label>
+        <input asp-for="Input.FullName" autocomplete="name"/>
+        <label asp-for="Input.Email">
+            @Model.T("Email", "ایمیل")</label>
+        <input asp-for="Input.Email" autocomplete="email"/>
+        <label asp-for="Input.Mobile">
+            @Model.T(Model.Workshop ? "Mobile (required)" : "Mobile (optional)", Model.Workshop ? "موبایل (الزامی)" : "موبایل (اختیاری)")</label>
+        <input asp-for="Input.Mobile" autocomplete="tel"/>
+        <label asp-for="Input.TelegramUsername">
+            @Model.T("Telegram (optional)", "تلگرام (اختیاری)")</label>
+        <input asp-for="Input.TelegramUsername"/>
+        <label class="check">
+            <input asp-for="Input.MarketingConsent"/>
+            @Model.T("Send me future courses, articles, and workshop announcements. Optional; unsubscribe anytime.", "مایلم اخبار دوره‌ها، مقاله‌ها و کارگاه‌ها را دریافت کنم. اختیاری است و هر زمان امکان لغو وجود دارد.")</label>
+        <p>
+            <a href="/@Model.Culture/privacy">
+                @Model.T("How we use your details", "نحوه استفاده از اطلاعات شما")</a>
+        </p>
+        <button class="btn btn-dark">
+            @Model.T(Model.Workshop ? "Reserve seat" : "Enroll for free", Model.Workshop ? "رزرو صندلی" : "ثبت‌نام رایگان")</button>
+    </form>
+</section>

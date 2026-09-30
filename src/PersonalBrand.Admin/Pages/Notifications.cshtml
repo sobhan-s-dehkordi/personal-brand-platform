@@ -1,0 +1,55 @@
+@page
+@model NotificationsModel
+@{
+    ViewData["Title"] = "Notifications";
+}
+<h1>Notification status</h1>
+<div class="status-grid">
+    <div class="callout">
+        <strong>Email delivery</strong>
+        <p>
+            @(Model.EmailConfigured ? "Configured" : "Not configured; delivery is disabled")</p>
+    </div>
+    <div class="callout">
+        <strong>Administrator Telegram</strong>
+        <p>
+            @(Model.TelegramConfigured ? "Configured" : "Not configured; delivery is disabled")</p>
+    </div>
+</div>
+<p class="help">Check delivery status below. Participants receive email and administrators receive Telegram notifications. Connection settings are managed by the site operator. Payment receipts are available only in this panel.</p>
+<table>
+    <thead>
+        <tr>
+            <th>Channel</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Attempts</th>
+            <th>Next attempt (UTC)</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var n in Model.Items){
+            <tr>
+                <td>
+                    @n.Channel</td>
+                <td>
+                    @n.Subject</td>
+                <td>
+                    @(n.SentAt != null ? "Sent" : n.Attempts >= 10 ? "Failed; retry needed" : "Queued")</td>
+                <td>
+                    @n.Attempts</td>
+                <td>
+                    @n.NextAttemptAt?.ToString("u")</td>
+                <td>
+                    @if(n.SentAt == null){
+                        <form method="post" asp-page-handler="Retry">
+                            <input type="hidden" name="id" value="@n.Id"/>
+                            <button>Retry</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,27 @@
+@page "/{kind:regex(^(Courses|Workshops)$)}/{parent:guid}/{child:regex(^(Lessons|Sessions)$)}"
+@model ChildrenModel
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@{ ViewData["Title"] = Model.Kind == "Courses" ? "Lessons and videos" : "Workshop sessions"; }
+<div class="page-heading"><div><a href="/@Model.Kind/Edit/@Model.Parent">← Back to content</a><h1>@ViewData["Title"]</h1><p>Edit both languages together. The list uses English titles.</p></div></div>
+<section class="panel">
+    @if (Model.Items.Count == 0) { <p>No entries yet.</p> }
+    @foreach (var item in Model.Items)
+    { <a class="activity-row" asp-route-edit="@item.Id"><span class="avatar">@item.Order</span>@item.Title</a> }
+    <a class="btn" href="/@Model.Kind/@Model.Parent/@(Model.Kind == "Courses" ? "Lessons" : "Sessions")">Add entry</a>
+</section>
+<form method="post">
+    <div asp-validation-summary="All"></div>
+    <div class="language-columns">
+    @foreach (var language in new[] { "English", "Persian" })
+    {
+        var input = language == "English" ? Model.English : Model.Persian;
+        var data = new ViewDataDictionary(ViewData);
+        data.TemplateInfo.HtmlFieldPrefix = language;
+        data["Kind"] = Model.Kind;
+        data["Direction"] = language == "English" ? "ltr" : "rtl";
+        <section class="panel"><h2>@language content</h2><partial name="_ChildFields" model="input" view-data="data"/></section>
+    }
+    </div>
+    <div class="save-bar"><span>Both languages are required, even when hidden.</span><button class="btn btn-dark">Save both languages</button></div>
+</form>
+

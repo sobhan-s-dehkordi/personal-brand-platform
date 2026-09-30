@@ -1,0 +1,18 @@
+@page
+@model MediaModel
+<h1>Site images</h1>
+<p>Upload an image and paste its address into a cover image field. JPG, PNG, and WebP files up to 5 MB are accepted.</p>
+<form method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All">
+    </div>
+    <label asp-for="Upload">Image</label>
+    <input asp-for="Upload" type="file" accept=".jpg,.jpeg,.png,.webp"/>
+    <button class="btn btn-dark">Upload image</button>
+</form>
+@if(Model.PublicPath is not null){
+    <div class="callout">
+        <strong>Image address — copy this address</strong>
+        <p>
+            @Model.PublicPath</p>
+    </div>
+}

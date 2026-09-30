@@ -1,0 +1,40 @@
+@page "/{culture:regex(^(en|fa)$)}/{name:regex(^(about|resume|now|contact|privacy)$)}"
+@model InfoModel
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@inject PersonalBrand.Infrastructure.SiteContent SiteCopy
+@{
+    var brand = await SiteCopy.BrandAsync(ViewContext.RouteData.Values["culture"]?.ToString() ?? "en");
+    ViewData["Title"] = Ui.Label(Model.Name, Model.Culture);
+}
+<article class="reading">
+    <h1>
+        @ViewData["Title"]</h1>
+    @if(Model.Name == "about" && brand.ProfileImage is not null) {
+        <img class="profile-image" src="@brand.ProfileImage" alt="@brand.Name" loading="lazy"/> }
+    <div class="prose">
+        @Html.Raw(Markdown.Render(Model.Body))</div>
+    @if(Model.Name == "resume" && brand.ResumePath is not null) {
+        <a class="btn btn-dark" href="@brand.ResumePath">
+            @Model.T("Download CV", "دانلود رزومه")</a>
+    }
+    @if(Model.Name is "about" or "contact" or "resume") {
+        <p>
+            @brand.Name · @brand.ProfessionalTitle</p>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(brand.ShortBio))</div>
+        <div class="actions">
+            @if(!string.IsNullOrEmpty(brand.ContactEmail)) {
+                <a href="mailto:@brand.ContactEmail">Email</a>
+            }
+            @if(brand.GitHubUrl is not null) {
+                <a href="@brand.GitHubUrl">GitHub</a>
+            }
+            @if(brand.LinkedInUrl is not null) {
+                <a href="@brand.LinkedInUrl">LinkedIn</a>
+            }
+            @if(brand.YouTubeUrl is not null) {
+                <a href="@brand.YouTubeUrl">YouTube</a>
+            }
+        </div>
+    }
+</article>

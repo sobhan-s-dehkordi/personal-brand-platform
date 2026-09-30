@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /en/reservations/
+Disallow: /fa/reservations/
+Disallow: /en/unsubscribe/
+Disallow: /fa/unsubscribe/
+

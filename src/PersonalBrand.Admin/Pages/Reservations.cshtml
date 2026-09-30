@@ -1,0 +1,53 @@
+@page
+@model ReservationsModel
+<h1>Reservations and receipts</h1>
+<form method="get" class="panel form-grid">
+    <label for="q">Name, email, or reservation reference</label>
+    <input name="q" id="q" value="@Model.Q"/>
+    <input type="hidden" name="workshop" value="@Model.Workshop"/>
+    <label for="status">Status</label>
+    <select id="status" name="status">
+        <option value="">All</option>
+        @foreach(var s in Enum.GetNames<PersonalBrand.Core.ReservationStatus>()){
+            <option value="@s" selected="@(s==Model.Status?.ToString())">
+                @AdminLabels.Text(s)</option>
+        }
+    </select>
+    <label for="since">Since</label>
+    <input type="date" name="since" id="since"/>
+    <button class="btn btn-dark">Show results</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Reservation reference</th>
+            <th>Participant</th>
+            <th>Workshop</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var r in Model.Items){
+            <tr>
+                <td>
+                    <a href="/Reservations/@r.Id">
+                        @r.PublicReference</a>
+                </td>
+                <td>
+                    @r.Contact.FullName</td>
+                <td>
+                    @r.Workshop.Title</td>
+                <td>
+                    @AdminLabels.Text(r.Status.ToString())</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<nav class="pagination">
+    @if(Model.Number>1){
+        <a asp-route-number="@(Model.Number-1)" asp-route-workshop="@Model.Workshop" asp-route-status="@Model.Status" asp-route-q="@Model.Q">Previous</a>
+    }
+    @if(Model.Items.Count==25){
+        <a asp-route-number="@(Model.Number+1)" asp-route-workshop="@Model.Workshop" asp-route-status="@Model.Status" asp-route-q="@Model.Q">Next</a>
+    }
+</nav>

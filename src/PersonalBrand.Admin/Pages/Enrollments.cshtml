@@ -1,0 +1,59 @@
+@page
+@model EnrollmentsModel
+<h1>Course enrollments</h1>
+<form method="get" class="panel form-grid">
+    <label for="course">Course</label>
+    <select id="course" name="course">
+        <option value="">All courses</option>
+        @foreach(var c in Model.Courses){
+            <option value="@c.Id" selected="@(c.Id==Model.Course)">
+                @c.Title</option>
+        }
+    </select>
+    <label for="language">Language</label>
+    <select id="language" name="language">
+        <option value="">All</option>
+        <option value="en" selected="@(Model.Language=="en")">English</option>
+        <option value="fa" selected="@(Model.Language=="fa")">Persian</option>
+    </select>
+    <label for="since">Enrolled since</label>
+    <input type="date" name="since" id="since" value="@Model.Since?.ToString("yyyy-MM-dd")"/>
+    <button class="btn btn-dark">Show results</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Participant</th>
+            <th>Date (UTC)</th>
+            <th>Language / source</th>
+            <th>Newsletter consent</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var e in Model.Items){
+            <tr>
+                <td>
+                    @e.Course.Title</td>
+                <td>
+                    <a href="/Contacts/@e.ContactId">
+                        @e.Contact.FullName</a>
+                </td>
+                <td>
+                    @e.EnrolledAt.ToString("u")</td>
+                <td>
+                    @e.Language / @e.Source</td>
+                <td>
+                    @(e.MarketingConsent?"Opted in":"No")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<nav class="pagination">
+    @if(Model.Number>1){
+        <a asp-route-number="@(Model.Number-1)" asp-route-course="@Model.Course" asp-route-language="@Model.Language" asp-route-since="@Model.Since">Previous</a>
+    }
+    @if(Model.Items.Count==25){
+        <a asp-route-number="@(Model.Number+1)" asp-route-course="@Model.Course" asp-route-language="@Model.Language" asp-route-since="@Model.Since">Next</a>
+    }
+</nav>

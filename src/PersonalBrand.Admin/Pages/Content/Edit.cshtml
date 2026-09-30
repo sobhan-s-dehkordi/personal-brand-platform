@@ -1,0 +1,93 @@
+@page "/{kind:regex(^(Articles|Courses|Projects|Workshops)$)}/Edit/{id:guid?}"
+@model PersonalBrand.Admin.Pages.Content.EditModel
+@{ ViewData["Title"] = "Edit " + Model.Kind; }
+<div class="page-heading"><div>
+    <a href="/@Model.Kind">← Back to @Model.Kind</a>
+    <h1>@ViewData["Title"]</h1>
+    <p>Complete both languages and save them together. Visibility controls each language independently.</p>
+    @if (Model.Kind == "Workshops") { <p>Each language has its own capacity, price, schedule, and reservations.</p> }
+</div></div>
+<form method="post" class="bilingual-form">
+    <div asp-validation-summary="All"></div>
+    <div class="language-columns">
+    @foreach (var language in new[] { "en", "fa" })
+    {
+        var prefix = language == "en" ? "English" : "Persian";
+        var input = language == "en" ? Model.English : Model.Persian;
+        var direction = language == "en" ? "ltr" : "rtl";
+        <section class="panel language-panel">
+            <h2>@prefix content</h2>
+            <label class="check" for="@(prefix)_visible">
+                <input type="checkbox" id="@(prefix)_visible" name="@(prefix).IsVisible" value="true" checked="@input.IsVisible"/>
+                Show on the @prefix website
+            </label>
+            <input type="hidden" name="@(prefix).IsVisible" value="false"/>
+            @foreach (var field in Model.Properties)
+            {
+                var value = input.Fields.GetValueOrDefault(field.Name);
+                var name = prefix + ".Fields[" + field.Name + "]";
+                var fieldId = prefix + "_" + field.Name;
+                var rich = field.Name is "Body" or "Summary" or "Problem" or "Solution" or "ArchitectureDescription" or "Challenges" or "Results" or "WhatYouWillBuild" or "Prerequisites" or "Audience" or "Platform";
+                <div class="field">
+                    <label for="@fieldId">@AdminLabels.Text(field.Name) @(field.Name is "Title" or "Body" ? "*" : "")</label>
+                    @if (field.PropertyType.IsEnum)
+                    {
+                        <select id="@fieldId" name="@name">
+                            @foreach (var option in Enum.GetNames(field.PropertyType))
+                            { <option value="@option" selected="@(option == value)">@AdminLabels.Text(option)</option> }
+                        </select>
+                    }
+                    else if (field.PropertyType == typeof(bool))
+                    {
+                        <select id="@fieldId" name="@name">
+                            <option value="False" selected="@(value == "False")">No</option>
+                            <option value="True" selected="@(value == "True")">Yes</option>
+                        </select>
+                    }
+                    else if (rich)
+                    { <textarea rich-editor id="@fieldId" name="@name" dir="@direction">@value</textarea> }
+                    else
+                    { <input id="@fieldId" name="@name" value="@value" dir="@(field.PropertyType == typeof(string) && !field.Name.EndsWith("Url") && field.Name is not ("Slug" or "CoverImage" or "TimeZoneId" or "Currency") ? direction : "ltr")" required="@(field.Name == "Title")"/> }
+                    @if (field.Name == "Slug") { <small>Optional. A unique URL slug is generated when left blank.</small> }
+                    @if (field.Name.Contains("Date") || field.Name.EndsWith("At")) { <small>Use a date, time, and timezone, for example 2026-10-20T18:00:00+03:30.</small> }
+                    @if (field.Name == "CoverImage") { <small>Upload an image in <a href="/Media" target="_blank">Media</a> and paste its address here.</small> }
+                    @if (field.Name == "Price") { <small>Enter the amount in the selected currency. IRR means Iranian rial.</small> }
+                </div>
+            }
+            @if (Model.Kind is "Articles" or "Projects")
+            {
+                <div class="field"><label for="@(prefix)_tags">Tags / technologies</label>
+                    <input id="@(prefix)_tags" name="@(prefix).Tags" value="@input.Tags" dir="@direction"/>
+                    <small>Separate entries with commas.</small></div>
+            }
+            @if (Model.Kind == "Articles")
+            {
+                <div class="field">
+                    <label class="check" for="@(prefix)_hasRelatedCourses">
+                        <input type="checkbox" id="@(prefix)_hasRelatedCourses" name="@(prefix).HasRelatedCourses" value="true" checked="@input.HasRelatedCourses" data-related-toggle aria-controls="@(prefix)_relatedCourses" aria-expanded="@(input.HasRelatedCourses ? "true" : "false")"/>
+                        Has related courses
+                    </label>
+                    <input type="hidden" name="@(prefix).HasRelatedCourses" value="false"/>
+                    <div id="@(prefix)_relatedCourses" hidden="@(!input.HasRelatedCourses)">
+                    <label for="@(prefix)_courses">Select related courses</label>
+                    <select id="@(prefix)_courses" name="@(prefix).RelatedCourseIds" multiple disabled="@(!input.HasRelatedCourses)">
+                    @foreach (var course in Model.CourseOptions.Where(x => x.Title.EndsWith("(" + language + ")")))
+                    { <option value="@course.Id" selected="@input.RelatedCourseIds.Contains(course.Id)">@course.Title</option> }
+                    </select></div></div>
+            }
+            @if (Model.Kind == "Projects")
+            {
+                <div class="field"><label for="@(prefix)_screenshots">Project screenshots</label>
+                    <textarea id="@(prefix)_screenshots" name="@(prefix).Screenshots" dir="ltr">@input.Screenshots</textarea>
+                    <small>One image per line: image URL | alternative text.</small></div>
+            }
+            @if (Model.Kind == "Workshops" && Model.Versions.TryGetValue(language, out var version))
+            { <a href="/Reservations?workshop=@version.Id">@prefix reservations</a> }
+        </section>
+    }
+    </div>
+    <div class="save-bar"><span>Both languages are required, even when hidden.</span><button class="btn btn-dark">Save both languages</button></div>
+</form>
+@section Scripts {
+    <script src="~/js/related-content.js" asp-append-version="true" defer></script>
+}

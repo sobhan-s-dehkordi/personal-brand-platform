@@ -1,0 +1,160 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Overview";
+}
+<section class="welcome-panel">
+    <div>
+        <span class="eyebrow">Your site at a glance</span>
+        <h1>Welcome to your workspace.</h1>
+        <p>Keep content up to date, track registrations, and manage your audience.</p>
+    </div>
+    <a class="btn" href="/HomeContent">Edit homepage ↗</a>
+</section>
+<div class="metric-grid">
+    <a class="metric-card attention" href="/Reservations?status=PaymentSubmitted">
+        <small>Receipts awaiting review</small>
+        <strong>
+            @Model.Metrics["Awaiting review"]</strong>
+        <em>Review payments ←</em>
+    </a>
+    <a class="metric-card" href="/Reservations?status=Confirmed">
+        <small>Confirmed participants</small>
+        <strong>
+            @Model.Metrics["Confirmed participants"]</strong>
+        <em>Confirmed workshop reservations</em>
+    </a>
+    <a class="metric-card" href="/Enrollments">
+        <small>Course enrollments</small>
+        <strong>
+            @Model.Metrics["Course enrollments"]</strong>
+        <em>Audience learning activity</em>
+    </a>
+    <a class="metric-card" href="/Subscribers">
+        <small>Subscribers</small>
+        <strong>
+            @Model.Metrics["Active subscribers"]</strong>
+        <em>Active subscribers</em>
+    </a>
+</div>
+<section class="panel">
+    <div class="panel-header">
+        <h2>Quick actions</h2>
+        <span class="help">Common tasks</span>
+    </div>
+    <div class="quick-grid">
+        <a class="quick-action" href="/Articles/Create">
+            <strong>＋ Write an article</strong>
+            <span>Turn an idea into an article.</span>
+        </a>
+        <a class="quick-action" href="/Workshops/Create">
+            <strong>＋ Create a workshop</strong>
+            <span>Set the schedule, capacity, and registration details.</span>
+        </a>
+        <a class="quick-action" href="/Courses">
+            <strong>▷ Lessons and videos</strong>
+            <span>Choose a course and add a lesson or video.</span>
+        </a>
+    </div>
+</section>
+<div class="two-columns">
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Recent reservations</h2>
+            <a href="/Reservations">All reservations ←</a>
+        </div>
+        @if (Model.RecentReservations.Count == 0)
+        {
+            <div class="empty-state">
+                <strong>No reservations yet.</strong>
+                <p>New registrations will appear here after a workshop is published.</p>
+                <a href="/Workshops">Manage workshops ←</a>
+            </div>
+        }
+        @foreach (var item in Model.RecentReservations)
+        {
+            <a class="activity-row" href="/Reservations/@item.Id">
+                <span class="avatar">
+                    @(item.Contact.FullName.FirstOrDefault())</span>
+                <div>
+                    <strong>
+                        @item.Contact.FullName</strong>
+                    <p class="help">
+                        @item.Workshop.Title</p>
+                </div>
+                <span class="status-badge @(item.Status == PersonalBrand.Core.ReservationStatus.PaymentSubmitted ? "warning" : "")">
+                    @AdminLabels.Text(item.Status.ToString())</span>
+            </a>
+        }
+    </section>
+    <section class="panel">
+        <h2>Site activity</h2>
+        <div class="activity-row">
+            <strong>
+                @Model.Metrics["Published articles"] published articles</strong>
+            <a href="/Articles">Manage ←</a>
+        </div>
+        <div class="activity-row">
+            <strong>
+                @Model.Metrics["Published courses"] published courses</strong>
+            <a href="/Courses">Manage ←</a>
+        </div>
+        <div class="activity-row">
+            <strong>
+                @Model.Metrics["Contacts this month"] new contacts in 30 days</strong>
+        </div>
+        <div class="activity-row">
+            <strong>
+                @Model.UnsentNotifications unsent messages</strong>
+            <a href="/Notifications">Review delivery ←</a>
+        </div>
+        <p class="help">For unsent messages, check email and Telegram configuration in Notification status.</p>
+    </section>
+</div>
+<section class="panel">
+    <div class="panel-header">
+        <h2>Upcoming workshops</h2>
+        <a href="/Workshops">Manage workshops ←</a>
+    </div>
+    @if (Model.Workshops.Count == 0)
+    {
+        <p class="empty-state">No workshops scheduled. Create a workshop to get started.</p>
+    }
+    else
+    {
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Workshop</th>
+                        <th>Confirmed</th>
+                        <th>Held / under review</th>
+                        <th>Remaining capacity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Workshops)
+                    {
+                        <tr>
+                            <td>
+                                <a href="/Workshops/Edit/@item.Id">
+                                    @item.Title</a>
+                                <div><a href="/Reservations?workshop=@item.Id">English reservations</a></div>
+                                @if (item.Persian is not null) { <div><a href="/Reservations?workshop=@item.Persian.Id">Persian reservations</a></div> }
+                            </td>
+                            <td>
+                                <div>EN: @item.Confirmed</div>
+                                @if (item.Persian is not null) { <div>FA: @item.Persian.Confirmed</div> }</td>
+                            <td>
+                                <div>EN: @item.Held</div>
+                                @if (item.Persian is not null) { <div>FA: @item.Persian.Held</div> }</td>
+                            <td>
+                                <div>EN: @(item.Capacity - item.Confirmed - item.Held)</div>
+                                @if (item.Persian is not null) { <div>FA: @(item.Persian.Capacity - item.Persian.Confirmed - item.Persian.Held)</div> }</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

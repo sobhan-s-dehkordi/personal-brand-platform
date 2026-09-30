@@ -1,0 +1,31 @@
+@page
+@model HomeContentModel
+@using PersonalBrand.Infrastructure
+@{ ViewData["Title"] = "Homepage and identity"; }
+<div class="page-heading"><div><h1>Homepage and identity</h1><p>Edit the content in both languages. Navigation, buttons, and interface labels are fixed.</p></div></div>
+<form method="post" class="bilingual-form">
+    <div asp-validation-summary="All"></div>
+    @foreach (var group in SiteContent.Fields.GroupBy(x => x.Group))
+    {
+        <h2>@group.Key</h2>
+        <div class="language-columns">
+        @foreach (var language in new[] { "en", "fa" })
+        {
+            <section class="panel">
+                <h3>@(language == "en" ? "English" : "Persian")</h3>
+                @foreach (var field in group)
+                {
+                    var key = field.Key + "." + language;
+                    <div class="field"><label for="@key">@field.Label</label>
+                    @if (field.Rich)
+                    { <textarea rich-editor id="@key" name="Values[@key]" dir="@(language == "fa" ? "rtl" : "ltr")">@Model.Values.GetValueOrDefault(key)</textarea> }
+                    else
+                    { <input id="@key" name="Values[@key]" value="@Model.Values.GetValueOrDefault(key)" dir="@(language == "fa" ? "rtl" : "ltr")"/> }
+                    </div>
+                }
+            </section>
+        }
+        </div>
+    }
+    <div class="save-bar"><span>Save English and Persian content together.</span><button class="btn btn-dark">Save both languages</button></div>
+</form>

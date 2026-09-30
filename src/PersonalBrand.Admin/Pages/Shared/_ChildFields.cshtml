@@ -1,0 +1,40 @@
+@model PersonalBrand.Admin.Pages.ChildInput
+<label class="check"><input asp-for="Published"/>Show on this language’s website</label>
+            <input asp-for="Id" type="hidden"/>
+            <label asp-for="Title">Title</label>
+            <input asp-for="Title" dir="@(ViewData["Direction"])"/>
+            <label asp-for="Order">Display order</label>
+            <input asp-for="Order"/>
+            @if((ViewData["Kind"] as string) == "Courses")
+            {
+                <label asp-for="VideoId">YouTube video URL</label>
+                <input asp-for="VideoId" dir="ltr" placeholder="https://www.youtube.com/watch?v=lOKD08QAhyc"/>
+                <p class="help">Paste the video URL. Short links, Shorts, and video IDs are also accepted. No embed code is needed.</p>
+                <label asp-for="Slug">Lesson URL slug</label>
+                <input asp-for="Slug" dir="ltr" placeholder="lesson-one"/>
+                <label asp-for="Summary">Lesson summary</label>
+                <textarea rich-editor dir="@(ViewData["Direction"])" asp-for="Summary"></textarea>
+            }
+            <label asp-for="Body">Body and description</label>
+            <textarea rich-editor dir="@(ViewData["Direction"])" asp-for="Body"></textarea>
+            @if((ViewData["Kind"] as string) == "Courses")
+            {
+                <label asp-for="KeyPoints">Key points</label>
+                <textarea rich-editor dir="@(ViewData["Direction"])" asp-for="KeyPoints"></textarea>
+                <label asp-for="Resources">Resources and links</label>
+                <textarea rich-editor dir="@(ViewData["Direction"])" asp-for="Resources"></textarea>
+                <label asp-for="GitHubUrl">GitHub URL (optional)</label>
+                <input asp-for="GitHubUrl" dir="ltr"/>
+                <label asp-for="Duration">Duration (minutes)</label>
+                <input asp-for="Duration"/>
+    
+            }
+            else
+            {
+                <label asp-for="Start">Start time</label>
+                <input asp-for="Start" type="text" dir="ltr"/>
+                <label asp-for="End">End time</label>
+                <input asp-for="End" type="text" dir="ltr"/>
+                <p class="help">Date and time with timezone, for example: <bdi>2026-10-20T18:00:00+03:30</bdi>
+                </p>
+            }

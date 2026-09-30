@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+if ! command -v pwsh >/dev/null 2>&1; then
+  echo 'Publication blocked: PowerShell 7 is required.' >&2
+  exit 1
+fi
+# Scan every reachable commit, including files deleted after an earlier commit.
+exec pwsh -NoLogo -NoProfile -File tools/Test-Publication.ps1 -History

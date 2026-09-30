@@ -1,0 +1,50 @@
+@page "/{culture:regex(^(en|fa)$)}/{section:regex(^(articles|courses|projects|workshops)$)}"
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@model CatalogModel
+@{
+    ViewData["Title"] = Ui.Label(Model.Section, Model.Culture);
+}
+<header class="page-heading">
+    <span class="eyebrow">
+        @Model.T("THE WORK / THE THINKING", "ساختن / اندیشیدن")</span>
+    <h1>
+        @ViewData["Title"]</h1>
+</header>
+<form method="get" class="search">
+    <label for="q">
+        @Model.T("Search", "جستجو")</label>
+    <input id="q" name="q" value="@Model.Q" maxlength="100"/>
+    <button class="btn btn-dark">
+        @Model.T("Find", "بگرد")</button>
+</form>
+<div class="cards">
+    @foreach (var item in Model.Items) {
+        <article class="content-card">
+            @if(item.Image is not null) {
+                <img src="@item.Image" alt="" loading="lazy"/> }
+            <h2>
+                <a href="/@Model.Culture/@Model.Section/@item.Slug">
+                    @item.Title</a>
+            </h2>
+            <div class="prose">
+                @Html.Raw(Markdown.Render(item.Summary))</div>
+        </article>
+    }
+</div>
+@if(Model.Items.Count == 0) { @if(!string.IsNullOrWhiteSpace(Model.EmptyMessage)) {
+        <div class="prose empty-message">
+            @Html.Raw(Markdown.Render(Model.EmptyMessage))</div>
+    } else {
+        <p>
+            @Model.T("No published items match your search.", "مطلبی یافت نشد.")</p>
+    } }
+<nav class="pagination">
+    @if(Model.Number > 1) {
+        <a asp-route-number="@(Model.Number-1)" asp-route-q="@Model.Q" asp-route-tag="@Model.Tag">
+            @Model.T("Previous", "قبلی")</a>
+    }
+    @if(Model.HasNext) {
+        <a asp-route-number="@(Model.Number+1)" asp-route-q="@Model.Q" asp-route-tag="@Model.Tag">
+            @Model.T("Next", "بعدی")</a>
+    }
+</nav>

@@ -1,0 +1,81 @@
+@page "/{kind:regex(^(Articles|Courses|Projects|Workshops)$)}"
+@model PersonalBrand.Admin.Pages.Content.IndexModel
+@{
+    ViewData["Title"] = AdminLabels.Text(Model.Kind);
+}
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">Content library</span>
+        <h1>
+            @ViewData["Title"]</h1>
+        <p>Manage both languages from one entry. Each language has independent website visibility.</p>
+    </div>
+    <a class="btn btn-dark" href="/@Model.Kind/Create">＋ Add content</a>
+</div>
+<section class="panel">
+    <form method="get" class="search-form">
+        <label for="q">Search titles</label>
+        <input id="q" name="q" value="@Model.Q" placeholder="Enter a title"/>
+        <button>Search</button>
+    </form>
+    @if (Model.Items.Count == 0)
+    {
+        <div class="empty-state">
+            <strong>No content found.</strong>
+            <p>Change your search or create your first content.</p>
+            <a href="/@Model.Kind/Create">Add content ←</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Website visibility</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <a href="/@Model.Kind/Edit/@item.Id">
+                                    @item.Title</a>
+                            </td>
+                            <td>
+                                <span>English: @(item.EnglishVisible ? "Shown" : "Hidden")</span><br/>
+                                <span>Persian: @(item.PersianVisible ? "Shown" : "Hidden")</span></td>
+                            <td>
+                                <span class="status-badge">
+                                    @AdminLabels.Text(item.Status)</span>
+                            </td>
+                            <td>
+                                <a href="/@Model.Kind/Edit/@item.Id">Edit</a>
+                                @if (Model.Kind == "Courses") {
+                                    <a href="/Courses/@item.Id/Lessons">Lessons and videos</a>
+                                }
+                                @if (Model.Kind == "Workshops") {
+                                    <a href="/Workshops/@item.Id/Sessions">Sessions</a>
+                                    <a href="/Reservations?workshop=@item.Id">English reservations</a>
+                                    @if (item.PersianId is Guid persianId) { <a href="/Reservations?workshop=@persianId">Persian reservations</a> }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    <nav class="pagination">
+        @if(Model.Number > 1){
+            <a asp-route-number="@(Model.Number - 1)" asp-route-q="@Model.Q">Previous</a>
+        }
+        @if(Model.Items.Count == 25){
+            <a asp-route-number="@(Model.Number + 1)" asp-route-q="@Model.Q">Next</a>
+        }
+    </nav>
+</section>

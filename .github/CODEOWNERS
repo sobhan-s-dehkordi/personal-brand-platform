@@ -1,0 +1,8 @@
+# Publishing controls and CI changes require owner review.
+/.gitignore @sobhan-s-dehkordi
+/.gitattributes @sobhan-s-dehkordi
+/.publication-policy.json @sobhan-s-dehkordi
+/.gitleaks.toml @sobhan-s-dehkordi
+/.githooks/ @sobhan-s-dehkordi
+/.github/ @sobhan-s-dehkordi
+/tools/ @sobhan-s-dehkordi

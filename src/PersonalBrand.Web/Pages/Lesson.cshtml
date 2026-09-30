@@ -1,0 +1,42 @@
+@page "/{culture:regex(^(en|fa)$)}/courses/{courseSlug}/lessons/{lessonSlug}"
+@model LessonModel
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@{
+    ViewData["Title"] = Model.Item.Title;
+}
+<article class="reading">
+    <a href="/@Model.Culture/courses/@Model.Item.Course.Slug">
+        @Model.Item.Course.Title</a>
+    <h1>
+        @Model.Item.Title</h1>
+    @if(Model.Item.YouTubeVideoId is not null) {
+        <iframe class="video" src="https://www.youtube-nocookie.com/embed/@Model.Item.YouTubeVideoId" title="@Model.Item.Title" loading="eager" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
+        </iframe>
+    }
+    @if(Model.Item.YouTubeVideoId is not null) {
+        <p>
+            <a href="https://www.youtube.com/watch?v=@Model.Item.YouTubeVideoId" target="_blank" rel="noopener">
+                @Model.T("Watch on YouTube ↗", "تماشا در یوتیوب ↗")</a>
+        </p>
+    }
+    <div class="lead prose">
+        @Html.Raw(Markdown.Render(Model.Item.Summary))</div>
+    <h2>
+        @Model.T("Key points", "نکات کلیدی")</h2>
+    @Html.Raw(Markdown.Render(Model.Item.KeyPoints))
+    <div class="prose">
+        @Html.Raw(Markdown.Render(Model.Item.ContentBody))</div>
+    <h2>
+        @Model.T("Resources", "منابع")</h2>
+    @Html.Raw(Markdown.Render(Model.Item.Resources))@if(Model.Item.GitHubUrl is not null) {
+        <a href="@Model.Item.GitHubUrl">GitHub ↗</a>
+    }
+    <nav class="lesson-list" aria-label="Lessons">
+        @foreach(var lesson in Model.Navigation) {
+            <p>
+                <a aria-current="@(lesson.Id == Model.Item.Id ? "page" : null)" href="/@Model.Culture/courses/@Model.Item.Course.Slug/lessons/@lesson.Slug">
+                    @(lesson.Order < Model.Item.Order ? "← " : lesson.Order > Model.Item.Order ? "→ " : "• ")@lesson.Title</a>
+            </p>
+        }
+    </nav>
+</article>

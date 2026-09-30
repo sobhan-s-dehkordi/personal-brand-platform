@@ -1,0 +1,96 @@
+@inject Microsoft.Extensions.Options.IOptions<PersonalBrand.Core.SiteOptions> Site
+@{
+    var path = Context.Request.Path.Value ?? "/";
+    string Active(string target) => target == "/" ? path == "/" ? "active" : "" : path.StartsWith(target, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <meta name="robots" content="noindex,nofollow"/>
+        <title>
+            @ViewData["Title"] — Site administration</title>
+        <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin/>
+        <link rel="stylesheet" href="~/lib/quill/quill.snow.css"/>
+        <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true"/>
+    </head>
+    <body class="@(User.IsInRole("Administrator") ? "admin-app" : "auth-page")">
+        @if (User.IsInRole("Administrator"))
+        {
+            <aside class="sidebar">
+                <a class="admin-brand" href="/">
+                    <span class="brand-icon">S</span>
+                    <span>Workspace<small>Admin Panel</small>
+                    </span>
+                </a>
+                <nav aria-label="Admin navigation">
+                    <a class="@Active("/")" href="/">
+                        <span>◫</span>Overview</a>
+                    <p class="nav-label">Content</p>
+                    <a class="@Active("/HomeContent")" href="/HomeContent">
+                        <span>⌂</span>Homepage and identity</a>
+                    @foreach (var section in new[] { "Articles", "Courses", "Workshops", "Projects" })
+                    {
+                        <a class="@Active("/" + section)" href="/@(section)">
+                            <span>▤</span>
+                            @AdminLabels.Text(section)</a>
+                    }
+                    <a class="@Active("/Settings")" href="/Settings">
+                        <span>⚙</span>Pages and settings</a>
+                    <a class="@Active("/Media")" href="/Media">
+                        <span>▧</span>Media</a>
+                    <p class="nav-label">Audience and payments</p>
+                    <a class="@Active("/Reservations")" href="/Reservations">
+                        <span>◷</span>Reservations and receipts</a>
+                    <a class="@Active("/Enrollments")" href="/Enrollments">
+                        <span>✓</span>Course enrollments</a>
+                    <a class="@Active("/Contacts")" href="/Contacts">
+                        <span>♙</span>Contacts</a>
+                    <a class="@Active("/Subscribers")" href="/Subscribers">
+                        <span>✉</span>Subscribers</a>
+                    <a class="@Active("/Notifications")" href="/Notifications">
+                        <span>◎</span>Notification status</a>
+                    <p class="nav-label">Account and access</p>
+                    <a class="@Active("/Administrators")" href="/Administrators">
+                        <span>♧</span>Administrators</a>
+                    <a class="@Active("/Account/ChangePassword")" href="/Account/ChangePassword">
+                        <span>◇</span>Change password</a>
+                </nav>
+                <a class="sidebar-preview" href="@(Site.Value.BaseUrl)/fa" target="_blank" rel="noopener">View website ↗</a>
+            </aside>
+        }
+        <div class="admin-workspace">
+            @if (User.IsInRole("Administrator"))
+            {
+                <header class="topbar">
+                    <span>Admin workspace <span class="muted">/ @ViewData["Title"]</span>
+                    </span>
+                    <div class="account-area">
+                        <span dir="ltr">
+                            @User.Identity?.Name</span>
+                        <form method="post" asp-page="/Account/Logout">
+                            <button class="text-button sign-out-button" type="submit" title="Sign out" aria-label="Sign out">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                                    <path d="M9 5H5v14h4M17 8l4 4-4 4M9 12h12"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </header>
+            }
+            <main class="admin-main" id="main">
+                @if (TempData["Message"] is string message)
+                {
+                    <div role="status" class="success-message">✓ @message</div>
+                }
+                @RenderBody()
+            </main>
+        </div>
+        <script src="~/lib/quill/quill.js" defer>
+        </script>
+        <script src="~/js/rich-editor.js" asp-append-version="true" defer>
+        </script>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
+</html>

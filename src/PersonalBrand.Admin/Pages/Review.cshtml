@@ -1,0 +1,36 @@
+@page "/Reservations/{id:guid}"
+@model ReviewModel
+<h1>
+    @Model.Item.PublicReference</h1>
+<p>
+    @Model.Item.Workshop.Title · @Model.Item.Status</p>
+<p>
+    <a href="/Contacts/@Model.Item.ContactId">
+        @Model.Item.Contact.FullName</a> · @Model.Item.Contact.Email · @Model.Item.Contact.Mobile</p>
+<p>
+    @Model.Item.PriceAtReservationTime @Model.Item.Currency · hold deadline @Model.Item.HoldExpiresAt.ToString("u")</p>
+<h2>Payment receipts</h2>
+@foreach(var receipt in Model.Item.Receipts){
+    <div class="callout">
+        <p>Tracking: @receipt.TrackingNumber · @receipt.UploadedAt.ToString("u")</p>
+        <a asp-page-handler="Receipt" asp-route-receipt="@receipt.Id" target="_blank" rel="noopener">View receipt image</a>
+    </div>
+}
+<form method="post">
+    <div asp-validation-summary="All">
+    </div>
+    <label asp-for="Note">Internal review note (administrators only)</label>
+    <textarea asp-for="Note"></textarea>
+    @if(Model.Item.Status==PersonalBrand.Core.ReservationStatus.PaymentSubmitted){
+        <button class="btn btn-dark" name="action" value="confirm">Confirm payment</button>
+        <button class="btn btn-outline-danger" name="action" value="reject">Reject payment</button>
+    }
+    @if(Model.Item.Status is PersonalBrand.Core.ReservationStatus.PendingPayment or PersonalBrand.Core.ReservationStatus.PaymentSubmitted or PersonalBrand.Core.ReservationStatus.Confirmed){
+        <button class="btn btn-outline-danger" name="action" value="cancel">Cancel reservation</button>
+    }
+</form>
+<h2>Change history</h2>
+@foreach(var h in Model.Item.History.OrderByDescending(x=>x.OccurredAt)){
+    <p>
+        @h.OccurredAt.ToString("u") · @h.Action · @h.ActorType · @h.Note</p>
+}

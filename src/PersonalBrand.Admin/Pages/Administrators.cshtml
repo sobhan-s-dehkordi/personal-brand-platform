@@ -1,0 +1,49 @@
+@page
+@model AdministratorsModel
+@{
+    ViewData["Title"] = "Administrators";
+}
+<div class="page-heading">
+    <div>
+        <span class="eyebrow">Access management</span>
+        <h1>Administrators</h1>
+        <p>People with access to content, payments, and site settings.</p>
+    </div>
+</div>
+<div class="two-columns">
+    <section class="panel">
+        <h2>Current administrators <span class="badge">
+                @Model.Administrators.Count</span>
+        </h2>
+        @foreach (var person in Model.Administrators)
+        {
+            <div class="person-row">
+                <span class="avatar">
+                    @person.Email?[0].ToString().ToUpperInvariant()</span>
+                <div>
+                    <strong dir="ltr">
+                        @person.Email</strong>
+                    <p>
+                        @(person.UserName == User.Identity?.Name ? "Your account" : "Administrator")</p>
+                </div>
+                <span class="status-badge">Full access</span>
+            </div>
+        }
+    </section>
+    <section class="panel">
+        <h2>Add administrator</h2>
+        <p class="help">This account will have full access, including creating administrators.</p>
+        <form method="post">
+            <div asp-validation-summary="All">
+            </div>
+            <label asp-for="Input.Email">Email</label>
+            <input asp-for="Input.Email" autocomplete="off" dir="ltr"/>
+            <label asp-for="Input.Password">Password</label>
+            <input asp-for="Input.Password" autocomplete="new-password" dir="ltr"/>
+            <p class="help">At least 12 characters, including uppercase and lowercase letters, a number, and a symbol.</p>
+            <label asp-for="Input.ConfirmPassword">Confirm password</label>
+            <input asp-for="Input.ConfirmPassword" autocomplete="new-password" dir="ltr"/>
+            <button class="btn btn-dark">Create administrator</button>
+        </form>
+    </section>
+</div>

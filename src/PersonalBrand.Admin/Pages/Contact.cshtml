@@ -1,0 +1,24 @@
+@page "/Contacts/{id:guid}"
+@model ContactModel
+<h1>
+    @Model.Item.FullName</h1>
+<p>
+    @Model.Item.Email · @Model.Item.Mobile · @Model.Item.TelegramUsername</p>
+<p>
+    @Model.Item.PreferredLanguage · @Model.Item.CreatedAt.ToString("u")</p>
+<h2>Enrollments</h2>
+@foreach(var e in Model.Enrollments){
+    <p>
+        @e.Course.Title · @e.EnrolledAt.ToString("u") · @e.Source · consent at enrollment: @e.MarketingConsent</p>
+}
+<h2>Workshop history</h2>
+@foreach(var r in Model.Reservations){
+    <p>
+        <a href="/Reservations/@r.Id">
+            @r.PublicReference — @r.Workshop.Title</a> · @r.Status</p>
+}
+<h2>Consent history</h2>
+@foreach(var c in Model.Consents){
+    <p>
+        @c.ConsentType · @c.GrantedAt.ToString("u") · @(c.RevokedAt==null?"Granted":"Revoked "+c.RevokedAt) · @c.Source · policy @c.PrivacyPolicyVersion</p>
+}

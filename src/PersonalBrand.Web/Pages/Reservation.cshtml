@@ -1,0 +1,51 @@
+@page "/{culture:regex(^(en|fa)$)}/reservations/{token}"
+@inject PersonalBrand.Infrastructure.SafeMarkdown Markdown
+@model ReservationModel
+@{
+    ViewData["Title"] = Model.T("Your reservation", "رزرو شما");
+    ViewData["NoIndex"] = true;
+}
+<section class="reading">
+    <h1>
+        @ViewData["Title"]</h1>
+    <h2>
+        @Model.Item.Workshop.Title</h2>
+    <p>
+        @Model.Item.PublicReference</p>
+    <div class="callout">
+        <strong>
+            @Model.StatusLabel(Model.Item.Status == PersonalBrand.Core.ReservationStatus.PendingPayment && !Model.AcceptsPayment ? PersonalBrand.Core.ReservationStatus.Expired : Model.Item.Status)</strong>
+        <p>
+            @Model.Item.PriceAtReservationTime.ToString("N0") @Model.Item.Currency</p>
+        <p>
+            @Model.T("Payment deadline (UTC)", "مهلت پرداخت (UTC)"): @Model.Item.HoldExpiresAt.ToString("u")</p>
+    </div>
+    <p>
+        @Model.T("Keep this private link. It gives access to your reservation.", "این پیوند خصوصی را نگه دارید؛ دسترسی به رزرو شما را فراهم می‌کند.")</p>
+    @if(Model.AcceptsPayment) {
+        <h2>
+            @Model.T("Card-to-card payment", "پرداخت کارت‌به‌کارت")</h2>
+        <p>
+            @Model.Payment.GetValueOrDefault("Payment.BankName") · @Model.Payment.GetValueOrDefault("Payment.CardHolderName")</p>
+        <p dir="ltr">
+            @Model.Payment.GetValueOrDefault("Payment.CardNumberDisplay")</p>
+        <div class="prose">
+            @Html.Raw(Markdown.Render(Model.Payment.GetValueOrDefault("Payment.Instructions." + Model.Culture, Model.T("Contact the organizer for payment details before transferring funds.", "پیش از واریز برای دریافت اطلاعات پرداخت با برگزارکننده تماس بگیرید."))))</div>
+        <form method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="All">
+            </div>
+            <label asp-for="Tracking">
+                @Model.T("Transfer tracking number", "شماره پیگیری تراکنش")</label>
+            <input asp-for="Tracking"/>
+            <label asp-for="Receipt">
+                @Model.T("Receipt image (JPEG, PNG, WebP; maximum 5 MB)", "تصویر رسید (JPEG، PNG یا WebP؛ حداکثر ۵ مگابایت)")</label>
+            <input asp-for="Receipt" type="file" accept=".jpg,.jpeg,.png,.webp"/>
+            <button class="btn btn-dark">
+                @Model.T("Submit for review", "ارسال برای بررسی")</button>
+        </form>
+    }
+    else {
+        <p>
+            @Model.T("If you need help with a payment, contact the organizer with your reservation reference.", "برای پیگیری پرداخت، با شماره رزرو با برگزارکننده تماس بگیرید.")</p>
+    }
+</section>

@@ -1,0 +1,158 @@
+/* Locally hosted variable fonts. Licenses are distributed in /fonts. */
+@font-face {
+    font-family: "Vazirmatn";
+    src: url("../fonts/Vazirmatn-Variable.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Inter";
+    src: url("../fonts/Inter-Variable.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+}
+:root {
+    --font-latin: "Inter", "Vazirmatn", "Segoe UI", sans-serif;
+    --font-persian: "Vazirmatn", "Inter", Tahoma, sans-serif;
+}
+body {
+    font-family: var(--font-latin);
+    font-weight: 400;
+    font-optical-sizing: auto;
+    font-kerning: normal;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.8;
+}
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+h1,
+h2,
+h3 {
+    font-family: inherit;
+    font-weight: 650;
+    letter-spacing: -0.035em;
+    line-height: 1.22;
+    text-wrap: pretty;
+}
+h2 {
+    letter-spacing: -0.025em;
+}
+h3 {
+    letter-spacing: -0.018em;
+}
+p {
+    text-wrap: pretty;
+}
+.lead {
+    font-weight: 400;
+    line-height: 1.85;
+}
+.site-header nav,
+.actions,
+.btn {
+    font-weight: 500;
+}
+.content-card h2,
+.content-card h3 {
+    line-height: 1.45;
+    margin-bottom: 18px;
+}
+.content-card p {
+    line-height: 1.85;
+}
+.brand {
+    letter-spacing: -0.035em;
+}
+input[type="email"],
+input[type="tel"] {
+    direction: ltr;
+    text-align: start;
+}
+.prose pre,
+.prose code {
+    font-family: Consolas, "Cascadia Code", monospace;
+    direction: ltr;
+    letter-spacing: normal;
+    text-align: left;
+}
+.prose :not(pre) > code {
+    unicode-bidi: isolate;
+}
+form button {
+    margin-inline: 0 16px;
+}
+.check {
+    align-items: start;
+    line-height: 1.9;
+}
+.check input[type="checkbox"] {
+    flex: 0 0 auto;
+    margin-top: 0.5em;
+}
+html:lang(fa) body {
+    font-family: var(--font-persian);
+    line-height: 2;
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+html:lang(fa) :is(h1, h2, h3, .brand, .eyebrow, .lead, .btn, nav, label) {
+    letter-spacing: normal;
+    word-spacing: normal;
+}
+html:lang(fa) :is(h1, h2, h3) {
+    line-height: 1.65;
+    font-weight: 700;
+}
+html:lang(fa) h1 {
+    font-size: clamp(2.15rem, 4.5vw, 4.1rem);
+}
+html:lang(fa) .reading h1 {
+    font-size: clamp(1.9rem, 3.6vw, 3.2rem);
+}
+html:lang(fa) .lead {
+    line-height: 2;
+    font-size: 1.3rem;
+}
+html:lang(fa) .eyebrow {
+    font-family: var(--font-persian);
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.9;
+}
+html:lang(fa) .content-card p,
+html:lang(fa) .prose p {
+    line-height: 2.05;
+}
+html:lang(fa) .content-card h3 {
+    font-size: 1.4rem;
+}
+html:lang(fa) .brand-dot {
+    display: inline-block;
+}
+@media (max-width: 600px) {
+    body {
+        font-size: 16px;
+    }
+    .hero h1 {
+        font-size: clamp(2.3rem, 8.5vw, 3.3rem);
+    }
+    html:lang(fa) .hero h1 {
+        font-size: clamp(2rem, 7.5vw, 3rem);
+        line-height: 1.7;
+    }
+    html:lang(fa) .lead {
+        font-size: 1.1rem;
+    }
+    .actions {
+        gap: 18px 24px;
+    }
+    .content-card {
+        padding: 26px;
+    }
+}

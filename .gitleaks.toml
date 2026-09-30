@@ -1,0 +1,13 @@
+title = "Personal Brand Platform publication scan"
+[extend]
+useDefault = true
+
+[[rules]]
+id = "private-key-material"
+description = "Private signing and encryption keys"
+regex = '''-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----'''
+
+[[rules]]
+id = "local-workstation-path"
+description = "Do not publish user-specific Windows workstation paths"
+regex = '''(?i)[A-Z]:[\\/](?:Users|Develop)[\\/][A-Za-z0-9_. -]+'''
