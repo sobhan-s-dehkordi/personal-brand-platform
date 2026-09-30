@@ -60,3 +60,6 @@ try {
         Remove-Item -LiteralPath $temp -Recurse -Force
     }
 }
+# Expected negative tests leave a native exit code of 1. GitHub's PowerShell
+# wrapper propagates it even when every assertion passed; clear it on success.
+$global:LASTEXITCODE = 0
